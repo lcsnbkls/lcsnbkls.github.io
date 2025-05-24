@@ -1,4 +1,4 @@
-<!-- [file name]: index.html -->
+<!-- index.html -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -76,87 +76,6 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        (function init() {
-            const isWeChat = /MicroMessenger/i.test(navigator.userAgent);
-            const $guide = $('.wechat-guide');
-            
-            if(isWeChat) {
-                const img = new Image();
-                img.src = 'IMG.jpg';
-                
-                img.onload = function() {
-                    $guide.show();
-                    $('html, body').css({
-                        'overflow': 'hidden',
-                        'height': '100%'
-                    });
-                };
-                
-                img.onerror = function() {
-                    $guide.html('<p style="text-align:center;padding:20px;color:red;">⚠️ 引导图加载失败，请使用浏览器访问</p>').show();
-                };
-                return;
-            }
-
-            window.showCardInfo = function() {
-                const modal = $(`
-                    <div class="modal-wrapper">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                   <p>此活动只针对站长好友开放</p>
-                                 <p>需赞赏后获取卡密：中奖率100%</p>
-                                <div class="wechat-row">
-                                    <span>复制站长微信</span>
-                                    <button class="copy-btn">📋 复制</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `).appendTo('body');
-
-                modal.on('click', function(e) {
-                    if ($(e.target).hasClass('modal-wrapper')) {
-                        $(this).fadeOut(200, () => $(this).remove());
-                    }
-                });
-
-                modal.find('.copy-btn').on('click', (e) => {
-                    e.stopPropagation();
-                    navigator.clipboard.writeText('LIVE-CS2025')
-                        .then(() => showAlert('微信号已复制'))
-                        .catch(err => console.error('复制失败:', err));
-                });
-            }
-
-            window.showQRCode = function() {
-                const modal = $(`
-                    <div class="modal-wrapper">
-                        <div class="modal-content">
-                            <div class="qrcode-body">
-                                <h3>赞赏支持</h3>
-                                <img src="qrcode.jpg" alt="赞赏二维码" style="max-width:100%">
-                                <p>扫码赞赏后联系站长核验</p>
-                            </div>
-                        </div>
-                    </div>
-                `).appendTo('body');
-
-                modal.on('click', function(e) {
-                    if ($(e.target).hasClass('modal-wrapper')) {
-                        $(this).fadeOut(200, () => $(this).remove());
-                    }
-                });
-            }
-
-            window.showAlert = function(msg) {
-                $('<div class="alert-message">'+msg+'</div>')
-                    .appendTo('body').delay(2000).fadeOut(300, function() { 
-                        $(this).remove(); 
-                    });
-            }
-        })();
-    </script>
-    <script defer src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

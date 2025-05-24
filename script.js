@@ -1,4 +1,4 @@
-// [file name]: script.js
+// script.js
 "use strict";
 
 const PRIZES = [
@@ -8,7 +8,6 @@ const PRIZES = [
     { id: 4, name: '专属球杆', prob: 0.1, desc: '定制台球杆一支', monthlyLimit: 1 }
 ];
 
-// 修正后的顺时针路径数组：0→1→2→5→8→7→6→3
 const clockwiseOrder = [0, 1, 2, 5, 8, 7, 6, 3];
 const prizeIndexMap = { 1:0, 2:2, 3:6, 4:8 };
 
@@ -55,17 +54,12 @@ class Lottery {
         this.audioIndex = 0;
     }
 
-    generateCode(prize) {
-        const d = new Date();
-        return `${d.getFullYear()}${(d.getMonth()+1).toString().padStart(2,'0')}${d.getDate().toString().padStart(2,'0')}${d.getHours().toString().padStart(2,'0')}_${prize.id}_${prize.name}`;
-    }
-
     updateHistoryDisplay() {
         const $list = $('.history-list').empty();
         this.history.slice(-5).reverse().forEach(record => {
             $list.append(`
                 <div class="history-item">
-                    <span>${record.code}</span>
+                    <span>${record.card} - ${record.name}</span>
                     <button class="copy-btn">📋</button>
                 </div>
             `);
@@ -103,7 +97,7 @@ class Lottery {
         this.$button.on('click', () => this.showCardModal());
         
         $(document).on('click', '.copy-btn', (e) => {
-            const text = $(e.target).prev().text();
+            const text = $(e.target).prev().text().split(' - ')[0];
             navigator.clipboard.writeText(text);
         });
 
@@ -215,7 +209,7 @@ class Lottery {
                 <div class="modal-content">
                     <div class="modal-body">
                         <h3 style="margin-bottom:15px;text-align:center">请输入卡密</h3>
-                        <input type="text" class="card-input" placeholder="输入卡密开始抽奖" maxlength="10">
+                        <input type="text" class="card-input" placeholder="输入卡密开始抽奖" maxlength="18">
                         <div style="margin-top:20px;text-align:center">
                             <button class="confirm-card action-btn">确认抽奖</button>
                         </div>
@@ -241,15 +235,42 @@ class Lottery {
     }
 
     validateCard(card) {
-        const regex = /^[A-Z]{10}$/;
+        const regex = /^\d{12}[A-Z]{6}$/;
         if(!regex.test(card)) {
             this.showAlert('卡密格式错误');
             return false;
         }
+        
+        const timePart = card.slice(0, 12);
+        const now = new Date();
+        
+        const year = parseInt(timePart.slice(0,4)),
+              month = parseInt(timePart.slice(4,6)) - 1,
+              day = parseInt(timePart.slice(6,8)),
+              hour = parseInt(timePart.slice(8,10)),
+              minute = parseInt(timePart.slice(10,12));
+        const cardDate = new Date(year, month, day, hour, minute);
+
+        if (
+            cardDate.getFullYear() !== now.getFullYear() ||
+            cardDate.getMonth() !== now.getMonth() ||
+            cardDate.getDate() !== now.getDate()
+        ) {
+            this.showAlert('卡密已过期');
+            return false;
+        }
+
+        const timeDiff = now - cardDate;
+        if (timeDiff < 0 || timeDiff > 300000) {
+            this.showAlert('卡密已失效');
+            return false;
+        }
+
         if(this.usedCards.has(card)) {
             this.showAlert('卡密已使用');
             return false;
         }
+        
         this.usedCards.add(card);
         localStorage.setItem('usedCards', JSON.stringify([...this.usedCards]));
         return true;
@@ -305,9 +326,9 @@ class Lottery {
 
     recordHistory(prize) {
         try {
-            const code = this.generateCode(prize);
             this.history = [...this.history, { 
-                code,
+                card: this.currentCard,
+                name: prize.name,
                 id: prize.id,
                 timestamp: Date.now()
             }].slice(-this.historyLimit);
@@ -329,4 +350,57 @@ $.fn.lottery = function() {
 
 $(function() {
     $('.lot-grid').lottery();
+
+    window.showCardInfo = function() {
+        const modal = $(`
+            <div class="modal-wrapper">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <p>此活动只针对站长好友开放</p>
+                        <p>需赞赏后获取卡密：中奖率100%</p>
+                        <div class="wechat-row">
+                            <span>复制站长微信</span>
+                            <button class="copy-btn">📋 复制</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).appendTo('body');
+
+        modal.on('click', function(e) {
+            if ($(e.target).hasClass('modal-wrapper')) {
+                $(this).fadeOut(200, () => $(this).remove());
+            }
+        });
+
+        modal.find('.copy-btn').on('click', (e) => {
+            e.stopPropagation();
+            navigator.clipboard.writeText('LIVE-CS2025')
+                .then(() => $('<div class="alert-message">微信号已复制</div>')
+                    .appendTo('body').delay(2000).fadeOut(300, function() { 
+                        $(this).remove(); 
+                    }))
+                .catch(err => console.error('复制失败:', err));
+        });
+    };
+
+    window.showQRCode = function() {
+        const modal = $(`
+            <div class="modal-wrapper">
+                <div class="modal-content">
+                    <div class="qrcode-body">
+                        <h3>赞赏支持</h3>
+                        <img src="qrcode.jpg" alt="赞赏二维码" style="max-width:100%">
+                        <p>扫码赞赏后联系站长核验</p>
+                    </div>
+                </div>
+            </div>
+        `).appendTo('body');
+
+        modal.on('click', function(e) {
+            if ($(e.target).hasClass('modal-wrapper')) {
+                $(this).fadeOut(200, () => $(this).remove());
+            }
+        });
+    };
 });

@@ -1,3 +1,4 @@
+/* style.css */
 :root {
     --glass-bg: rgba(30, 30, 30, 0.95);
     --glass-border: rgba(255, 255, 255, 0.15);
@@ -203,7 +204,7 @@ body {
     color: white;
     font-size: 16px;
     text-align: center;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
 }
 
 .wechat-row {
