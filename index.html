@@ -7,6 +7,7 @@
     <title>财神传送门</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        /* 微信引导层样式 */
         .wechat-guide {
             position: fixed;
             top: 0;
@@ -24,18 +25,15 @@
             padding: 15px;
             box-sizing: border-box;
         }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
     </style>
 </head>
 <body>
+    <!-- 微信引导层 -->
     <div class="wechat-guide">
         <img src="IMG.jpg" class="guide-image" alt="请使用浏览器打开">
     </div>
 
+    <!-- 主内容容器 -->
     <div class="main-container">
         <div class="lottery-wrap2">
             <div class="lot-grid">
@@ -76,6 +74,24 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // 微信环境检测与处理
+        (function() {
+            const isWechat = /MicroMessenger/i.test(navigator.userAgent);
+            const guide = document.querySelector('.wechat-guide');
+            const mainContent = document.querySelector('.main-container');
+            
+            if(isWechat) {
+                guide.style.display = 'block';
+                mainContent.style.display = 'none';
+                document.body.style.overflow = 'hidden';
+            } else {
+                guide.style.display = 'none';
+                mainContent.style.display = 'block';
+                document.body.style.overflow = 'auto';
+            }
+        })();
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
