@@ -3,21 +3,77 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>财源滚滚来</title>
+    <title>财神梦幻抽奖</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="preload" href="IMG.jpg" as="image">
+    <!-- 预加载关键资源 -->
+    <link rel="preload" href="IMG.jpg" as="image" importance="high">
     <link rel="preload" href="qrcode.jpg" as="image">
     <style>
-        img { 
-            vertical-align: middle;
-            -ms-interpolation-mode: bicubic; 
+        /* 全局性能优化 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
+        img {
+            max-width: 100%;
+            height: auto;
+            vertical-align: middle;
+            -ms-interpolation-mode: bicubic;
+        }
+        /* 加载动画 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* 弹窗优化 */
         .modal-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
             will-change: transform;
+            backface-visibility: hidden;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 90%;
         }
     </style>
 </head>
 <body>
+    <!-- 加载指示器 -->
+    <div class="loading-overlay">
+        <div class="loader"></div>
+    </div>
+
     <div class="main-container">
         <div class="lottery-wrap2">
             <div class="lot-grid">
@@ -59,11 +115,18 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        // 微信环境处理
-        if (/MicroMessenger/i.test(navigator.userAgent)) {
+        // ================ 微信环境处理（优化版） ================
+        (function initWechatHandler() {
+            // 仅微信环境执行
+            if (!/MicroMessenger/i.test(navigator.userAgent)) return;
+
+            // 显示加载动画
+            $('.loading-overlay').show();
+
+            // 动态加载图片（带缓存清除参数）
             const img = new Image();
-            img.src = 'IMG.jpg';
-            img.onload = () => {
+            img.src = 'IMG.jpg?' + new Date().getTime(); // 防止缓存
+            img.onload = function() {
                 document.body.innerHTML = `
                     <img src="${img.src}" 
                          style="position:fixed;
@@ -73,17 +136,40 @@
                                 height:100%;
                                 object-fit:contain;
                                 padding:10px;
+                                background:#fff;
                                 box-sizing:border-box;">`;
+                $('.loading-overlay').hide();
             };
-            document.write(''); // 立即清空页面
-            return;
-        }
+            img.onerror = function() {
+                document.body.innerHTML = '<div style="text-align:center;padding:20px;color:red;">⚠️ 图片加载失败，请检查网络或刷新页面</div>';
+                $('.loading-overlay').hide();
+            };
 
-        // 通用功能
+            return; // 阻止后续代码执行
+        })();
+
+        // ================ 通用功能模块（非微信环境执行） ================
         const $body = $(document.body);
-        
+        const $loading = $('.loading-overlay');
+
+        // 弹窗控制器
+        const Modal = {
+            show: (content) => {
+                $loading.show();
+                const $modal = $(content).appendTo($body);
+                $modal.on('click', function(e) {
+                    if ($(e.target).hasClass('modal-wrapper')) {
+                        $(this).fadeOut(200, () => $(this).remove());
+                    }
+                });
+                $loading.hide();
+                return $modal;
+            }
+        };
+
+        // 获取卡密功能
         window.showCardInfo = function() {
-            const modal = $(`
+            Modal.show(`
                 <div class="modal-wrapper">
                     <div class="modal-content">
                         <div class="modal-body">
@@ -96,45 +182,38 @@
                         </div>
                     </div>
                 </div>
-            `).appendTo($body);
-
-            modal.on('click', function(e) {
-                if ($(e.target).hasClass('modal-wrapper')) {
-                    $(this).fadeOut(200, () => $(this).remove());
-                }
-            });
-
-            modal.find('.copy-btn').on('click', function(e) {
+            `).find('.copy-btn').on('click', function(e) {
                 e.stopPropagation();
                 navigator.clipboard.writeText('LIVE-CS2025')
                     .then(() => showAlert('微信号已复制'))
-                    .catch(err => console.error('复制失败:', err));
+                    .catch(err => showAlert('复制失败，请手动复制'));
             });
         }
 
+        // 赞赏二维码功能
         window.showQRCode = function() {
-            const modal = $(`
+            Modal.show(`
                 <div class="modal-wrapper">
                     <div class="modal-content">
                         <div class="qrcode-body">
                             <h3>赞赏支持</h3>
-                            <img src="qrcode.jpg" alt="赞赏二维码">
+                            <img src="qrcode.jpg?${new Date().getTime()}" 
+                                 alt="赞赏二维码"
+                                 loading="lazy"
+                                 decoding="async">
                             <p>扫码赞赏后联系站长核验</p>
                         </div>
                     </div>
                 </div>
-            `).appendTo($body);
-
-            modal.on('click', function(e) {
-                if ($(e.target).hasClass('modal-wrapper')) {
-                    $(this).fadeOut(200, () => $(this).remove());
-                }
-            });
+            `);
         }
 
+        // 提示信息组件
         window.showAlert = function(msg) {
             $('<div class="alert-message">'+msg+'</div>')
-                .appendTo($body).delay(2000).fadeOut(300, function() { 
+                .appendTo($body)
+                .delay(2000)
+                .fadeOut(300, function() { 
                     $(this).remove(); 
                 });
         }
