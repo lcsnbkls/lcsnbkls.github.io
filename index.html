@@ -1,72 +1,93 @@
-<!DOCTYPE html>  
-<html>  
-<head>  
-    <meta charset="utf-8">  
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">  
-    <title>财神梦幻抽奖</title>  
-    <link rel="stylesheet" href="style.css">  
-    <style>  
-        /* 移除原.browser-tip相关样式 */  
-    </style>  
-</head>  
-<body>  
-    <!-- 移除.browser-tip的HTML元素 -->  
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>财神梦幻抽奖</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preload" href="IMG.jpg" as="image">
+    <link rel="preload" href="qrcode.jpg" as="image">
+    <style>
+        img { 
+            vertical-align: middle;
+            -ms-interpolation-mode: bicubic; 
+        }
+        .modal-wrapper {
+            will-change: transform;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="lottery-wrap2">
+            <div class="lot-grid">
+                <div class="lot-item" data-prize="1">体验券</div>
+                <div class="lot-item">幸运格</div>
+                <div class="lot-item" data-prize="2">店长特训</div>
+                <div class="lot-item">幸运格</div>
+                <div class="lot-item lot-btn">开始抽奖</div>
+                <div class="lot-item">幸运格</div>
+                <div class="lot-item" data-prize="3">周会员</div>
+                <div class="lot-item">幸运格</div>
+                <div class="lot-item" data-prize="4">专属球杆</div>
+            </div>
+        </div>
 
-    <div class="main-container">  
-        <!-- 抽奖界面保持不变 -->  
-        <div class="lottery-wrap2">  
-            <div class="lot-grid">  
-                <div class="lot-item" data-prize="1">体验券</div>  
-                <div class="lot-item">幸运格</div>  
-                <div class="lot-item" data-prize="2">店长特训</div>  
-                <div class="lot-item">幸运格</div>  
-                <div class="lot-item lot-btn">开始抽奖</div>  
-                <div class="lot-item">幸运格</div>  
-                <div class="lot-item" data-prize="3">周会员</div>  
-                <div class="lot-item">幸运格</div>  
-                <div class="lot-item" data-prize="4">专属球杆</div>  
-            </div>  
-        </div>  
+        <div class="action-container">
+            <a href="javascript:void(0)" class="action-btn" onclick="showCardInfo()">🎫 获取卡密</a>
+            <a href="javascript:void(0)" class="action-btn" onclick="showQRCode()">🦊 赞赏站长</a>
+        </div>
 
-        <!-- 操作按钮和说明面板保持不变 -->  
-        <div class="action-container">  
-            <a href="javascript:void(0)" class="action-btn" onclick="showCardInfo()">🎫 获取卡密</a>  
-            <a href="javascript:void(0)" class="action-btn" onclick="showQRCode()">🦊 赞赏站长</a>  
-        </div>  
+        <div class="info-panels">
+            <div class="prize-panel">
+                <h3>奖项说明</h3>
+                <div class="prize-item" data-prize="1">🎯 体验券：获得一小时体验卷一张</div>
+                <div class="prize-item" data-prize="2">🏆 店长特训：与店长球技切磋或加时半小时</div>
+                <div class="prize-item" data-prize="3">💎 周会员：获得尊享周会员权益</div>
+                <div class="prize-item" data-prize="4">🎁 专属球杆：获得精美定制球杆一套</div>
+            </div>
 
-        <div class="info-panels">  
-            <div class="prize-panel">  
-                <h3>奖项说明</h3>  
-                <div class="prize-item" data-prize="1">🎯 体验券：获得一小时体验卷一张</div>  
-                <div class="prize-item" data-prize="2">🏆 店长特训：与店长球技切磋或加时半小时</div>  
-                <div class="prize-item" data-prize="3">💎 周会员：获得尊享周会员权益</div>  
-                <div class="prize-item" data-prize="4">🎁 专属球杆：获得精美定制球杆一套</div>  
-            </div>  
+            <div class="history-panel">
+                <div class="history-header">
+                    <h3>中奖记录</h3>
+                    <button class="clear-history">清空</button>
+                </div>
+                <div class="history-list"></div>
+            </div>
+        </div>
+    </div>
 
-            <div class="history-panel">  
-                <div class="history-header">  
-                    <h3>中奖记录</h3>  
-                    <button class="clear-history">清空</button>  
-                </div>  
-                <div class="history-list"></div>  
-            </div>  
-        </div>  
-    </div>  
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>  
-    <script>  
-        // 微信环境处理（替换原检测逻辑）
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // 微信环境处理
         if (/MicroMessenger/i.test(navigator.userAgent)) {
-            document.body.innerHTML = `<img src="IMG_5115.jpeg" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);max-width:90%;height:auto;">`;
+            const img = new Image();
+            img.src = 'IMG.jpg';
+            img.onload = () => {
+                document.body.innerHTML = `
+                    <img src="${img.src}" 
+                         style="position:fixed;
+                                top:0;
+                                left:0;
+                                width:100%;
+                                height:100%;
+                                object-fit:contain;
+                                padding:10px;
+                                box-sizing:border-box;">`;
+            };
+            document.write(''); // 立即清空页面
+            return;
         }
 
-        // 保留原有弹窗和功能逻辑
+        // 通用功能
+        const $body = $(document.body);
+        
         window.showCardInfo = function() {
             const modal = $(`
                 <div class="modal-wrapper">
                     <div class="modal-content">
                         <div class="modal-body">
-                          <p>此活动只针对添加站长微信用户开放</p>
+                            <p>此活动只针对添加站长微信用户开放</p>
                             <p>需赞赏站长并发送截图获取卡密</p>
                             <div class="wechat-row">
                                 <span>LIVE-CS2025</span>
@@ -75,7 +96,7 @@
                         </div>
                     </div>
                 </div>
-            `).appendTo('body');
+            `).appendTo($body);
 
             modal.on('click', function(e) {
                 if ($(e.target).hasClass('modal-wrapper')) {
@@ -83,10 +104,11 @@
                 }
             });
 
-            modal.find('.copy-btn').on('click', (e) => {
+            modal.find('.copy-btn').on('click', function(e) {
                 e.stopPropagation();
-                navigator.clipboard.writeText('LIVE-CS2025');
-                showAlert('微信号已复制');
+                navigator.clipboard.writeText('LIVE-CS2025')
+                    .then(() => showAlert('微信号已复制'))
+                    .catch(err => console.error('复制失败:', err));
             });
         }
 
@@ -101,7 +123,7 @@
                         </div>
                     </div>
                 </div>
-            `).appendTo('body');
+            `).appendTo($body);
 
             modal.on('click', function(e) {
                 if ($(e.target).hasClass('modal-wrapper')) {
@@ -112,9 +134,11 @@
 
         window.showAlert = function(msg) {
             $('<div class="alert-message">'+msg+'</div>')
-                .appendTo('body').delay(2000).fadeOut(300, function() { $(this).remove(); });
+                .appendTo($body).delay(2000).fadeOut(300, function() { 
+                    $(this).remove(); 
+                });
         }
-    </script>  
-    <script src="script.js"></script>  
-</body>  
+    </script>
+    <script defer src="script.js"></script>
+</body>
 </html>
