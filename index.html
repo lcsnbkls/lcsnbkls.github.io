@@ -5,73 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>财神传送门</title>
     <link rel="stylesheet" href="style.css">
-    <!-- 预加载关键资源 -->
-    <link rel="preload" href="IMG.jpg" as="image" importance="high">
-    <link rel="preload" href="qrcode.jpg" as="image">
     <style>
-        /* 全局性能优化 */
+        /* 微信引导图样式 */
+        .wechat-guide {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            background: #fff;
+            display: none;
+        }
+        .guide-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+        /* 优化全局样式 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        img {
-            max-width: 100%;
-            height: auto;
-            vertical-align: middle;
-            -ms-interpolation-mode: bicubic;
-        }
-        /* 加载动画 */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.9);
-            z-index: 9999;
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        /* 弹窗优化 */
-        .modal-wrapper {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            will-change: transform;
-            backface-visibility: hidden;
-        }
-        .modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 90%;
-        }
     </style>
 </head>
 <body>
-    <!-- 加载指示器 -->
-    <div class="loading-overlay">
-        <div class="loader"></div>
+    <!-- 微信引导图容器 -->
+    <div class="wechat-guide">
+        <img src="IMG.jpg" class="guide-image" alt="请使用浏览器打开">
     </div>
 
     <div class="main-container">
@@ -115,108 +79,92 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        // ================ 微信环境处理（优化版） ================
-        (function initWechatHandler() {
-            // 仅微信环境执行
-            if (!/MicroMessenger/i.test(navigator.userAgent)) return;
+        // 微信环境处理
+        (function init() {
+            // 检测微信环境
+            const isWeChat = /MicroMessenger/i.test(navigator.userAgent);
+            const $guide = $('.wechat-guide');
+            
+            if(isWeChat) {
+                // 预加载图片
+                const img = new Image();
+                img.src = 'IMG.jpg';
+                
+                img.onload = function() {
+                    $guide.show();
+                    // 阻止页面滚动
+                    $('html, body').css({
+                        'overflow': 'hidden',
+                        'height': '100%'
+                    });
+                };
+                
+                img.onerror = function() {
+                    $guide.html('<p style="text-align:center;padding:20px;color:red;">⚠️ 引导图加载失败，请使用浏览器访问</p>').show();
+                };
+                
+                // 阻止后续代码执行
+                return;
+            }
 
-            // 显示加载动画
-            $('.loading-overlay').show();
+            // 非微信环境继续执行原有逻辑
+            window.showCardInfo = function() {
+                const modal = $(`
+                    <div class="modal-wrapper">
+                        <div class="modal-content">
+                            <div class="modal-body">
+                                <p>此活动只针对添加站长微信用户开放</p>
+                                <p>需赞赏站长并发送截图获取卡密</p>
+                                <div class="wechat-row">
+                                    <span>LIVE-CS2025</span>
+                                    <button class="copy-btn">📋 复制</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).appendTo('body');
 
-            // 动态加载图片（带缓存清除参数）
-            const img = new Image();
-            img.src = 'IMG.jpg?' + new Date().getTime(); // 防止缓存
-            img.onload = function() {
-                document.body.innerHTML = `
-                    <img src="${img.src}" 
-                         style="position:fixed;
-                                top:0;
-                                left:0;
-                                width:100%;
-                                height:100%;
-                                object-fit:contain;
-                                padding:10px;
-                                background:#fff;
-                                box-sizing:border-box;">`;
-                $('.loading-overlay').hide();
-            };
-            img.onerror = function() {
-                document.body.innerHTML = '<div style="text-align:center;padding:20px;color:red;">⚠️ 图片加载失败，请检查网络或刷新页面</div>';
-                $('.loading-overlay').hide();
-            };
-
-            return; // 阻止后续代码执行
-        })();
-
-        // ================ 通用功能模块（非微信环境执行） ================
-        const $body = $(document.body);
-        const $loading = $('.loading-overlay');
-
-        // 弹窗控制器
-        const Modal = {
-            show: (content) => {
-                $loading.show();
-                const $modal = $(content).appendTo($body);
-                $modal.on('click', function(e) {
+                modal.on('click', function(e) {
                     if ($(e.target).hasClass('modal-wrapper')) {
                         $(this).fadeOut(200, () => $(this).remove());
                     }
                 });
-                $loading.hide();
-                return $modal;
-            }
-        };
 
-        // 获取卡密功能
-        window.showCardInfo = function() {
-            Modal.show(`
-                <div class="modal-wrapper">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            <p>此活动只针对添加站长微信用户开放</p>
-                            <p>需赞赏站长并发送截图获取卡密</p>
-                            <div class="wechat-row">
-                                <span>LIVE-CS2025</span>
-                                <button class="copy-btn">📋 复制</button>
+                modal.find('.copy-btn').on('click', (e) => {
+                    e.stopPropagation();
+                    navigator.clipboard.writeText('LIVE-CS2025')
+                        .then(() => showAlert('微信号已复制'))
+                        .catch(err => console.error('复制失败:', err));
+                });
+            }
+
+            window.showQRCode = function() {
+                const modal = $(`
+                    <div class="modal-wrapper">
+                        <div class="modal-content">
+                            <div class="qrcode-body">
+                                <h3>赞赏支持</h3>
+                                <img src="qrcode.jpg" alt="赞赏二维码" style="max-width:100%">
+                                <p>扫码赞赏后联系站长核验</p>
                             </div>
                         </div>
                     </div>
-                </div>
-            `).find('.copy-btn').on('click', function(e) {
-                e.stopPropagation();
-                navigator.clipboard.writeText('LIVE-CS2025')
-                    .then(() => showAlert('微信号已复制'))
-                    .catch(err => showAlert('复制失败，请手动复制'));
-            });
-        }
+                `).appendTo('body');
 
-        // 赞赏二维码功能
-        window.showQRCode = function() {
-            Modal.show(`
-                <div class="modal-wrapper">
-                    <div class="modal-content">
-                        <div class="qrcode-body">
-                            <h3>赞赏支持</h3>
-                            <img src="qrcode.jpg?${new Date().getTime()}" 
-                                 alt="赞赏二维码"
-                                 loading="lazy"
-                                 decoding="async">
-                            <p>扫码赞赏后联系站长核验</p>
-                        </div>
-                    </div>
-                </div>
-            `);
-        }
-
-        // 提示信息组件
-        window.showAlert = function(msg) {
-            $('<div class="alert-message">'+msg+'</div>')
-                .appendTo($body)
-                .delay(2000)
-                .fadeOut(300, function() { 
-                    $(this).remove(); 
+                modal.on('click', function(e) {
+                    if ($(e.target).hasClass('modal-wrapper')) {
+                        $(this).fadeOut(200, () => $(this).remove());
+                    }
                 });
-        }
+            }
+
+            window.showAlert = function(msg) {
+                $('<div class="alert-message">'+msg+'</div>')
+                    .appendTo('body').delay(2000).fadeOut(300, function() { 
+                        $(this).remove(); 
+                    });
+            }
+        })();
     </script>
     <script defer src="script.js"></script>
 </body>
