@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,30 +7,6 @@
     <title>财神传送门</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        body {
-            background: #000;  /* 默认黑色背景 */
-            margin: 0;
-            min-height: 100vh;
-            font-family: 'Microsoft Yahei', sans-serif;
-            padding: 20px;
-            overflow-y: auto;
-            color: #fff;
-            position: relative;
-        }
-
-        #bg-video {
-            position: fixed;
-            right: 0;
-            bottom: 0;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            z-index: -1;
-            object-fit: cover;
-            filter: brightness(0.7);
-        }
-
         .wechat-guide {
             position: fixed;
             top: 0;
@@ -55,17 +32,10 @@
     </style>
 </head>
 <body>
-    <!-- 视频背景 -->
-    <video id="bg-video" autoplay muted loop playsinline>
-        <source src="https://v3-default.365yg.com/24808d148333c89cc762df51ebe4aba1/68321d06/video/tos/cn/tos-cn-ve-15-alinc2/4dc0c90d653244f888bdf73267cfd8b0/?a=2011&ch=0&cr=0&dr=0&er=0&lr=unwatermarked&net=5&cd=0%7C0%7C0%7C0&cv=1&br=3326&bt=3326&cs=0&ds=3&ft=k7Fz7VVywSyRKJ8kmo~pK7pswApb86NUvrKLO~ycdo0g3cI&mime_type=video_mp4&qs=0&rc=ODU2PGk6ZTw5NDY7Z2loN0BpanE7bjg6Zm84OjMzNGkzM0AxNi0uMC5gXmIxXzQ0NDE1YSNwNnNxcjQwNGVgLS1kLS9zcw%3D%3D&btag=80000e00018000&dy_q=1748111064&l=2025052502242426A51A416B86DD546059" type="video/mp4">
-    </video>
-
-    <!-- 微信引导层 -->
     <div class="wechat-guide">
         <img src="IMG.jpg" class="guide-image" alt="请使用浏览器打开">
     </div>
 
-    <!-- 主内容容器 -->
     <div class="main-container">
         <div class="lottery-wrap2">
             <div class="lot-grid">
@@ -81,13 +51,11 @@
             </div>
         </div>
 
-        <!-- 操作按钮 -->
         <div class="action-container">
             <a href="javascript:void(0)" class="action-btn" onclick="showCardInfo()">🎫 获取卡密</a>
             <a href="javascript:void(0)" class="action-btn" onclick="showQRCode()">🦊 赞赏站长</a>
         </div>
 
-        <!-- 信息面板 -->
         <div class="info-panels">
             <div class="prize-panel">
                 <h3>奖项说明</h3>
@@ -107,9 +75,7 @@
         </div>
     </div>
 
-    <!-- 依赖库 -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- 业务逻辑 -->
     <script src="script.js"></script>
 </body>
 </html>
