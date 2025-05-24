@@ -1,3 +1,4 @@
+<!-- [file name]: index.html -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,7 +7,6 @@
     <title>财神传送门</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* 微信引导图样式 */
         .wechat-guide {
             position: fixed;
             top: 0;
@@ -24,7 +24,6 @@
             padding: 15px;
             box-sizing: border-box;
         }
-        /* 优化全局样式 */
         * {
             margin: 0;
             padding: 0;
@@ -33,7 +32,6 @@
     </style>
 </head>
 <body>
-    <!-- 微信引导图容器 -->
     <div class="wechat-guide">
         <img src="IMG.jpg" class="guide-image" alt="请使用浏览器打开">
     </div>
@@ -61,10 +59,10 @@
         <div class="info-panels">
             <div class="prize-panel">
                 <h3>奖项说明</h3>
-                <div class="prize-item" data-prize="1">🎯 体验券：获得一小时体验卷一张</div>
-                <div class="prize-item" data-prize="2">🏆 店长特训：与店长球技切磋或加时半小时</div>
-                <div class="prize-item" data-prize="3">💎 周会员：获得尊享周会员权益</div>
-                <div class="prize-item" data-prize="4">🎁 专属球杆：获得精美定制球杆一套</div>
+                <div class="prize-item" data-prize="1">🎯 体验券：78%概率</div>
+                <div class="prize-item" data-prize="2">🏆 店长特训：18%概率</div>
+                <div class="prize-item" data-prize="3">💎 周会员：3.9%概率</div>
+                <div class="prize-item" data-prize="4">🎁 专属球杆：0.1%概率</div>
             </div>
 
             <div class="history-panel">
@@ -79,20 +77,16 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        // 微信环境处理
         (function init() {
-            // 检测微信环境
             const isWeChat = /MicroMessenger/i.test(navigator.userAgent);
             const $guide = $('.wechat-guide');
             
             if(isWeChat) {
-                // 预加载图片
                 const img = new Image();
                 img.src = 'IMG.jpg';
                 
                 img.onload = function() {
                     $guide.show();
-                    // 阻止页面滚动
                     $('html, body').css({
                         'overflow': 'hidden',
                         'height': '100%'
@@ -102,12 +96,9 @@
                 img.onerror = function() {
                     $guide.html('<p style="text-align:center;padding:20px;color:red;">⚠️ 引导图加载失败，请使用浏览器访问</p>').show();
                 };
-                
-                // 阻止后续代码执行
                 return;
             }
 
-            // 非微信环境继续执行原有逻辑
             window.showCardInfo = function() {
                 const modal = $(`
                     <div class="modal-wrapper">
