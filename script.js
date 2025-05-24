@@ -1,9 +1,10 @@
+// [file name]: script.js
 "use strict";
 
 const PRIZES = [
-    { id: 1, name: '体验券', prob: 60.0, desc: '免费体验台球1小时' },
-    { id: 2, name: '店长特训', prob: 36.9, desc: '店长一对一指导1小时', dailyLimit: 2 },
-    { id: 3, name: '周会员', prob: 3.0,  desc: '一周会员资格', weeklyLimit: 1 },
+    { id: 1, name: '体验券', prob: 78.0, desc: '免费体验台球1小时' },
+    { id: 2, name: '店长特训', prob: 18.0, desc: '店长一对一指导1小时', dailyLimit: 2 },
+    { id: 3, name: '周会员', prob: 3.9,  desc: '一周会员资格', weeklyLimit: 1 },
     { id: 4, name: '专属球杆', prob: 0.1, desc: '定制台球杆一支', monthlyLimit: 1 }
 ];
 
@@ -25,22 +26,25 @@ class Lottery {
         this.bindEvents();
     }
 
+    initStorage() {
+        try {
+            this.history = JSON.parse(localStorage.getItem('lotteryHistory') || '[]');
+            const savedCards = JSON.parse(localStorage.getItem('usedCards') || '[]');
+            this.usedCards = new Set(savedCards);
+            this.updateHistoryDisplay();
+        } catch(e) {
+            console.error('本地存储读取失败:', e);
+            this.history = [];
+            this.usedCards = new Set();
+        }
+    }
+
     initAudio() {
         for(let i = 0; i < 5; i++) {
             const clickAudio = new Audio('./click.mp3');
             this.audioPool.push(clickAudio);
         }
         this.winAudio = new Audio('./win.mp3');
-    }
-
-    initStorage() {
-        try {
-            this.history = JSON.parse(localStorage.getItem('lotteryHistory') || '[]');
-            this.updateHistoryDisplay();
-        } catch(e) {
-            console.error('本地存储读取失败:', e);
-            this.history = [];
-        }
     }
 
     init() {
@@ -246,6 +250,7 @@ class Lottery {
             return false;
         }
         this.usedCards.add(card);
+        localStorage.setItem('usedCards', JSON.stringify([...this.usedCards]));
         return true;
     }
 
