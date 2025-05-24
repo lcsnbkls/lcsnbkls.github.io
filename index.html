@@ -6,35 +6,14 @@
     <title>财神梦幻抽奖</title>  
     <link rel="stylesheet" href="style.css">  
     <style>  
-        .browser-tip {  
-            position: fixed;  
-            top: 0;  
-            left: 0;  
-            right: 0;  
-            background: #ffeb3b;  
-            padding: 10px;  
-            text-align: center;  
-            z-index: 9999;  
-            display: none;  
-            font-size: 14px;  
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);  
-        }  
-        .browser-tip-close {  
-            position: absolute;  
-            right: 12px;  
-            cursor: pointer;  
-            font-weight: bold;  
-            font-size: 18px;  
-        }  
+        /* 移除原.browser-tip相关样式 */  
     </style>  
 </head>  
 <body>  
-    <div class="browser-tip">  
-        ⚠️ 请使用系统浏览器访问，点击右上角选择默认浏览器打开  
-        <span class="browser-tip-close">×</span>  
-    </div>  
+    <!-- 移除.browser-tip的HTML元素 -->  
 
     <div class="main-container">  
+        <!-- 抽奖界面保持不变 -->  
         <div class="lottery-wrap2">  
             <div class="lot-grid">  
                 <div class="lot-item" data-prize="1">体验券</div>  
@@ -49,6 +28,7 @@
             </div>  
         </div>  
 
+        <!-- 操作按钮和说明面板保持不变 -->  
         <div class="action-container">  
             <a href="javascript:void(0)" class="action-btn" onclick="showCardInfo()">🎫 获取卡密</a>  
             <a href="javascript:void(0)" class="action-btn" onclick="showQRCode()">🦊 赞赏站长</a>  
@@ -75,69 +55,65 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>  
     <script>  
-        (function(){  
-            const ua = navigator.userAgent;  
-            if(/MicroMessenger|WeChat|QQBrowser|MQQBrowser|Quark/i.test(ua)){  
-                $(".browser-tip").css("display","flex").hide().fadeIn(500);  
-                $(".browser-tip-close").on("click",()=>{  
-                    $(".browser-tip").fadeOut(300);  
-                });  
-            }  
+        // 微信环境处理（替换原检测逻辑）
+        if (/MicroMessenger/i.test(navigator.userAgent)) {
+            document.body.innerHTML = `<img src="IMG_5115.jpeg" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);max-width:90%;height:auto;">`;
+        }
 
-            window.showCardInfo = function() {
-                const modal = $(`
-                    <div class="modal-wrapper">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                              <p>此活动只针对添加站长微信用户开放</p>
-                                <p>需赞赏站长并发送截图获取卡密</p>
-                                <div class="wechat-row">
-                                    <span>LIVE-CS2025</span>
-                                    <button class="copy-btn">📋 复制</button>
-                                </div>
+        // 保留原有弹窗和功能逻辑
+        window.showCardInfo = function() {
+            const modal = $(`
+                <div class="modal-wrapper">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                          <p>此活动只针对添加站长微信用户开放</p>
+                            <p>需赞赏站长并发送截图获取卡密</p>
+                            <div class="wechat-row">
+                                <span>LIVE-CS2025</span>
+                                <button class="copy-btn">📋 复制</button>
                             </div>
                         </div>
                     </div>
-                `).appendTo('body');
+                </div>
+            `).appendTo('body');
 
-                modal.on('click', function(e) {
-                    if ($(e.target).hasClass('modal-wrapper')) {
-                        $(this).fadeOut(200, () => $(this).remove());
-                    }
-                });
+            modal.on('click', function(e) {
+                if ($(e.target).hasClass('modal-wrapper')) {
+                    $(this).fadeOut(200, () => $(this).remove());
+                }
+            });
 
-                modal.find('.copy-btn').on('click', (e) => {
-                    e.stopPropagation();
-                    navigator.clipboard.writeText('LIVE-CS2025');
-                    showAlert('微信号已复制');
-                });
-            }
+            modal.find('.copy-btn').on('click', (e) => {
+                e.stopPropagation();
+                navigator.clipboard.writeText('LIVE-CS2025');
+                showAlert('微信号已复制');
+            });
+        }
 
-            window.showQRCode = function() {
-                const modal = $(`
-                    <div class="modal-wrapper">
-                        <div class="modal-content">
-                            <div class="qrcode-body">
-                                <h3>赞赏支持</h3>
-                                <img src="qrcode.jpg" alt="赞赏二维码">
-                                <p>扫码赞赏后联系站长核验</p>
-                            </div>
+        window.showQRCode = function() {
+            const modal = $(`
+                <div class="modal-wrapper">
+                    <div class="modal-content">
+                        <div class="qrcode-body">
+                            <h3>赞赏支持</h3>
+                            <img src="qrcode.jpg" alt="赞赏二维码">
+                            <p>扫码赞赏后联系站长核验</p>
                         </div>
                     </div>
-                `).appendTo('body');
+                </div>
+            `).appendTo('body');
 
-                modal.on('click', function(e) {
-                    if ($(e.target).hasClass('modal-wrapper')) {
-                        $(this).fadeOut(200, () => $(this).remove());
-                    }
-                });
-            }
+            modal.on('click', function(e) {
+                if ($(e.target).hasClass('modal-wrapper')) {
+                    $(this).fadeOut(200, () => $(this).remove());
+                }
+            });
+        }
 
-            window.showAlert = function(msg) {
-                $('<div class="alert-message">'+msg+'</div>')
-                    .appendTo('body').delay(2000).fadeOut(300, function() { $(this).remove(); });
-            }
-        })();  
+        window.showAlert = function(msg) {
+            $('<div class="alert-message">'+msg+'</div>')
+                .appendTo('body').delay(2000).fadeOut(300, function() { $(this).remove(); });
+        }
     </script>  
     <script src="script.js"></script>  
 </body>  
