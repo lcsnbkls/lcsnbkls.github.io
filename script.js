@@ -8,7 +8,8 @@ const PRIZES = [
     { id: 4, name: '专属球杆', prob: 0.1, desc: '定制台球杆一支', monthlyLimit: 1 }
 ];
 
-const clockwiseOrder = [0, 3, 6, 7, 8, 5, 2, 1];
+// 修正后的顺时针路径数组：0→1→2→5→8→7→6→3
+const clockwiseOrder = [0, 1, 2, 5, 8, 7, 6, 3];
 const prizeIndexMap = { 1:0, 2:2, 3:6, 4:8 };
 
 class Lottery {
