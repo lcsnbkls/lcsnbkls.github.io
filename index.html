@@ -29,6 +29,10 @@
             padding: 0;
             box-sizing: border-box;
         }
+        /* 新增主容器默认隐藏 */
+        .main-container {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -76,6 +80,33 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // 新版微信环境检测逻辑
+        (function() {
+            function isWechatBrowser() {
+                const ua = navigator.userAgent.toLowerCase();
+                return ua.indexOf('micromessenger') !== -1;
+            }
+
+            function toggleView() {
+                if(isWechatBrowser()) {
+                    $('.wechat-guide').show();
+                    $('.main-container').hide();
+                } else {
+                    $('.wechat-guide').hide();
+                    $('.main-container').show();
+                }
+            }
+
+            $(document).ready(function() {
+                // 初始化显示控制
+                toggleView();
+                
+                // 定时轮询检测（应对微信特殊场景）
+                setInterval(toggleView, 1000);
+            });
+        })();
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
